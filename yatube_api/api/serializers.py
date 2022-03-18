@@ -4,24 +4,30 @@ from rest_framework.relations import SlugRelatedField
 
 from posts.models import Comment, Post, Group, Follow, User
 
+from rest_framework.decorators import api_view
+
 
 class PostSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(slug_field='username', read_only=True)
+    author = SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
 
     class Meta:
-        fields = '__all__'
         model = Post
+        fields = '__all__'
 
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
+        read_only=True,
+        slug_field='username'
     )
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
-        fields = '__all__'
         model = Comment
-
+        fields = '__all__'
 
 class GroupSerializer(serializers.ModelSerializer):
 
@@ -40,6 +46,14 @@ class FollowSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
     )
+
+    @api_view(['POST'])
+    def validate_follow(self, following):
+        if self.request.user == following:
+            raise serializers.VaildationError(
+                'Подписка на себя невозможна.'
+            )
+            return following
 
     class Meta:
         model = Follow
