@@ -18,7 +18,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'django_filters',
     'djoser',
     'api',
     'posts',
@@ -101,10 +100,10 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
         'rest_framework.throttling.AnonRateThrottle',
     ],
-    'DEFAULT_THROTTLE_RATES': [
+    'DEFAULT_THROTTLE_RATES': {
         'user':'100/minute',
         'anon':'100/minute',
-    ],
+    },
 }
 
 SIMPLE_JWT = {
