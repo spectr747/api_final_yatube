@@ -1,14 +1,8 @@
-from email.policy import default
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from rest_framework.decorators import api_view
+from rest_framework.validators import UniqueTogetherValidator
 
-from django.contrib.auth import get_user_model
-
-from posts.models import Comment, Post, Group, Follow
-
-
-User = get_user_model()
+from posts.models import Comment, Post, Group, Follow, User
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -33,12 +27,19 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('id', 'username', 'first_name', 'last_name')
+        model = User
+
+
 class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Group
-        fields = ('id', 'title', 'slug', 'description')
-        read_only_fields = ('id',)
+        fields = '__all__'
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -48,28 +49,25 @@ class FollowSerializer(serializers.ModelSerializer):
     )
     user = serializers.SlugRelatedField(
         read_only=True,
-        # slug_field='username',
+        slug_field='username',
         default=serializers.CurrentUserDefault()
     )
 
-    # @api_view(['POST'])
-    def validate_following(self, data):
-        if data['following'] is None:
-            raise serializers.ValidationError(
-                'Отсутствует following.'
-            )
-        if self.context.get('request').user == data['following']:
+    def validate_following(self, value):
+        follower = self.contextp['request'].user
+        if validate_following == value:
             raise serializers.VaildationError(
                 'Подписка на себя невозможна.'
             )
-        return data
+        return value
 
     class Meta:
         model = Follow
-        fields = '__all__'
+        fields = ('id','user','following')
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
-                fields=('user','following')
+                fields=('user','following'),
+                message='Подписка на автора уже существует.'
             )
         ]
