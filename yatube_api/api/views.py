@@ -1,5 +1,5 @@
 from rest_framework import filters, viewsets, mixins
-from rest_framework.pagination import LimitOffsetPaginationfrom posts.models import Post, Group, User
+from rest_framework.pagination import LimitOffsetPagination
 
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,6 +15,7 @@ from .serializers import (
     CommentSerializer,
     FollowSerializer
 )
+from posts.models import Post, Group, User
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -46,7 +47,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     filterset_fields = ('text', 'author',)
-    search_fields = ('text','author__username',)
+    search_fields = ('text', 'author__username',)
 
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
@@ -66,7 +67,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 class CreateListViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    viewsets.GenericViewSet):
+    viewsets.GenericViewSet
+):
     pass
 
 
