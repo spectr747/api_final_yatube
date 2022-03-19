@@ -1,6 +1,7 @@
-from email.mime import base
-from django.urls import path, include
 from rest_framework import routers
+
+from django.urls import path, include
+
 from api.views import PostViewSet, CommentViewSet, GroupViewSet, FollowViewSet
 
 

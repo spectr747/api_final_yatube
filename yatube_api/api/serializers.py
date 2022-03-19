@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from rest_framework.validators import UniqueTogetherValidator
 
 from posts.models import Comment, Post, Group, Follow, User
 
@@ -63,11 +62,11 @@ class FollowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
-        fields = ('id','user','following')
+        fields = ('id', 'user', 'following')
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
-                fields=('user','following'),
+                fields=('user', 'following'),
                 message='Подписка на автора уже существует.'
             )
         ]

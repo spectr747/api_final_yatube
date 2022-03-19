@@ -1,6 +1,6 @@
-from django.db.models.deletion import CASCADE, SET_NULL
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models.deletion import CASCADE, SET_NULL
 
 User = get_user_model()
 
@@ -8,7 +8,7 @@ User = get_user_model()
 class Group(models.Model):
     slug = models.SlugField(unique=True, default='-пусто-')
     title = models.CharField(
-        max_length=200, 
+        max_length=200,
         verbose_name='Наименование группы'
     )
     description = models.TextField(verbose_name='Описание группы')
@@ -48,7 +48,7 @@ class Comment(models.Model):
 
     def __str__(self) -> str:
         return self.text
-        
+
 
 class Follow(models.Model):
     user = models.ForeignKey(
@@ -60,7 +60,7 @@ class Follow(models.Model):
         verbose_name='Подписчик'
     )
     following = models.ForeignKey(
-        User, 
+        User,
         on_delete=CASCADE,
         related_name='following',
         null=True,

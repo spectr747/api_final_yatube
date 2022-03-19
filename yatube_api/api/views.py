@@ -1,5 +1,9 @@
-from re import search
-from posts.models import Post, Group, User
+from rest_framework import filters, viewsets, mixins
+from rest_framework.pagination import LimitOffsetPaginationfrom posts.models import Post, Group, User
+
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+
 from .permissions import (
     IsAuthorOrReadOnly,
     IsFollowOrReadOnly
@@ -11,11 +15,6 @@ from .serializers import (
     CommentSerializer,
     FollowSerializer
 )
-
-from django.shortcuts import get_object_or_404
-from rest_framework import filters, viewsets, mixins
-from rest_framework.pagination import LimitOffsetPagination
-from django_filters.rest_framework import DjangoFilterBackend
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -29,13 +28,13 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     pagination_class = LimitOffsetPagination
-    filterset_fields = ('text','author','group','pub_date',)
+    filterset_fields = ('text', 'author', 'group', 'pub_date',)
     search_fields = ('text',)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    
+
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
@@ -46,9 +45,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
-    filterset_fields = ('text','author',)    
+    filterset_fields = ('text', 'author',)
     search_fields = ('text','author__username',)
-
 
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
@@ -65,7 +63,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
 
-class CreateListViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class CreateListViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet):
     pass
 
 
